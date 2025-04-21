@@ -3,26 +3,24 @@ const scoreCounter = document.querySelector("#scoreCounter");
 const playerField = document.querySelector("#playerField");
 const cpuField = document.querySelector("#cpuField");
 const messageField = document.querySelector("#messageField");
-messageField.textContent = '';
-playerField.textContent = '';
-cpuField.textContent = '';
-const rockButton = document.querySelector("#rock");
-const paperButton = document.getElementById("paper");
-const scissorsButton = document.getElementById("scissors");
-// getElementById is outdated
+messageField.textContent = 'Click to start';
+playerField.textContent, cpuField.textContent = '';
 
-let humanScore = 0;
-let cpuScore = 0;
+let rockButton = document.querySelector("#rock");
+let paperButton = document.querySelector("#paper");
+let scissorsButton = document.querySelector("#scissors");
+let resetButton = document.querySelector("#reset");
 
+resetButton.addEventListener("click", reset);
 
-// const element = document.getElementById("myBtn");
-// element.addEventListener("click", function() {
-//   document.getElementById("demo").innerHTML = "Hello World";
-
+let humanScore = 0,
+  cpuScore = 0,
+  started = false,
+  winThreshold = 0,
+  matchLimit = 0;
 
 function getComputerChoice() {
   let x = Math.random()
-  //console.log(`${x}`)
   if (x <= 0.33) {
     return 1;
   } else if (0.33 < x && x <= 0.66) {
@@ -42,63 +40,75 @@ function translate(x) {
   }
 }
 
-function game(human) {
+function playRound(human) {
+  messageField.textContent = '';
   const cpu = getComputerChoice();
-
   let result = human-cpu;
-  //console.log(`Player: ${(translate(human))}, CPU: ${(translate(cpu))}`);
   playerField.textContent = `${(translate(human))}`;
   cpuField.textContent = `${(translate(cpu))}`;
   switch(result) {
     case 1:
     case -2:
-      //console.log('Player wins!');
       messageField.textContent = 'Player wins!';
       humanScore++;
       break;
     case -1:
     case 2:
-      //console.log("CPU wins!");
       messageField.textContent = 'CPU wins!';
       cpuScore++;
       break;
     case 0:
-      //console.log('Draw!')
       messageField.textContent = 'Draw!';
       break;
   }
-//      messageField.textContent = '';
+  updateScore();
+  checkScore();
 }
 
-function main() {
-  const matchLimit = Number(prompt('How many games?', ''));
-  //console.log(`Playing ${matchLimit} games`);
-  gamesCounter.textContent = `Games: ${matchLimit}`
-  const winThreshold = Math.floor(matchLimit/2) + 1;
-
-
-  let keepGoing = true;
-  while (keepGoing) {
-    rockButton.addEventListener("click", game(1));
-    paperButton.addEventListener("click", game(2));
-    scissorsButton.addEventListener("click", game(3));
-    //console.log(`Score:\nHuman: ${humanScore}\nCPU: ${cpuScore}\n`);
-    scoreCounter.textContent = `Score:\nHuman: ${humanScore}\nCPU: ${cpuScore}\n`;
-    if (humanScore == winThreshold || cpuScore == winThreshold) {
-      keepGoing = false;
-    }
-  }
-
-  if (humanScore > cpuScore) {
-    //console.log('Humanity wins!');
+function checkScore() {
+  if (humanScore === winThreshold) {
     messageField.textContent = 'Humanity wins!';
+    gameOver();
   }
-  else {
-    //console.log('Destroyed all humans!');
+  else if (cpuScore === winThreshold) {
     messageField.textContent = 'Destroyed all humans!';
+    gameOver();
   }
 }
 
-main();
+function updateScore() {
+  scoreCounter.textContent = `Score:\nHuman: ${humanScore}\nCPU: ${cpuScore}`;
+}
+
+function reset() {
+  humanScore = 0;
+  cpuScore = 0; 
+  updateScore();
+  rockButton.disabled = false;
+  paperButton.disabled = false;
+  scissorsButton.disabled = false;
+  started = true;
+  resetButton.textContent = "Reset";
+  messageField.textContent = "";
+  
+  matchLimit = Number(prompt("How many games?", ''));
+  gamesCounter.textContent = `Games: ${matchLimit}`;
+  winThreshold = Math.floor(matchLimit/2) + 1;
+}
+
+function gameOver () {
+  rockButton.disabled = true;
+  paperButton.disabled = true;
+  scissorsButton.disabled = true;
+  gamesCounter.textContent = messageField.textContent;
+  started = false;
+  resetButton.textContent = "Play again"
+}
+
+rockButton.addEventListener("click", () => playRound(1));
+paperButton.addEventListener("click", () => playRound(2));
+scissorsButton.addEventListener("click", () => playRound(3));
+
+
 //this line is considered an ideal length before a line break, at 80 characters
 
